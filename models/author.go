@@ -25,16 +25,14 @@ func (author *AuthorResolver) SecondName() string {
 }
 
 func (author *AuthorResolver) Books() []*BookResolver {
-	var books []*BookResolver
-	first_book := &BookResolver{&Book{
-		ID:          "1",
-		Name:        "mybook",
-		Description: "",
-		PublishDate: "",
-		AuthorID:    "1",
-	}}
 
-	books = append(books, first_book)
+	books := make([]*BookResolver, 0, 1)
+
+	for _, book := range dm.Books {
+		if book.Data.AuthorID == author.Data.ID {
+			books = append(books, book)
+		}
+	}
 
 	return books
 }

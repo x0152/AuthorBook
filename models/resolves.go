@@ -1,65 +1,58 @@
 package models
 
-import "github.com/graph-gophers/graphql-go"
+import (
+	"fmt"
+	"log"
+
+	graphql "github.com/graph-gophers/graphql-go"
+)
 
 type Resolver struct {
-	//Books   map[graphql.ID]*book.Book
-	//uthor map[graphql.ID]*author.Author
-	//omment map[graphql.ID]*comment.Comment
 }
 
 func (r *Resolver) Book(args struct{ ID graphql.ID }) *BookResolver {
-	return &BookResolver{&Book{
-		ID:          "1",
-		Name:        "mybook",
-		Description: "",
-		PublishDate: "",
-		AuthorID:    "1",
-	}}
+	return dm.Books[args.ID]
 }
 
 func (r *Resolver) Author(args struct{ ID graphql.ID }) *AuthorResolver {
-	return &AuthorResolver{&Author{
-		ID:         "1",
-		Name:       "",
-		SecondName: "",
-	}}
+	return dm.Authors[args.ID]
 }
 
 func (r *Resolver) Comment(args struct{ ID graphql.ID }) *CommentResolver {
-	return &CommentResolver{&Comment{
-		ID:     "1",
-		Text:   "",
-		BookID: "1",
-		UserID: "1",
-	}}
+	return dm.Comments[args.ID]
+}
+
+func (r *Resolver) CreateComment(args struct {
+	Bookid graphql.ID
+	Text   string
+	Date   string
+}) *CommentResolver {
+
+	id := graphql.ID(fmt.Sprintf("%d", len(dm.Comments)))
+	newComment := &Comment{ID: id, BookID: args.Bookid, Text: args.Text, Date: args.Date}
+	newCommentResolve := &CommentResolver{newComment}
+	dm.Comments[id] = newCommentResolve
+
+	log.Printf("Добавлен коментарий %v", newComment)
+	return newCommentResolve
 }
 
 func (r *Resolver) Authors() []*AuthorResolver {
-	var authors []*AuthorResolver
+	authors := make([]*AuthorResolver, 0, len(dm.Books))
 
-	first_author := &AuthorResolver{&Author{
-		ID:         "1",
-		Name:       "name",
-		SecondName: "",
-	}}
-
-	authors = append(authors, first_author)
+	for _, author := range dm.Authors {
+		authors = append(authors, author)
+	}
 
 	return authors
 }
 
 func (r *Resolver) Books() []*BookResolver {
-	var books []*BookResolver
-	first_book := &BookResolver{&Book{
-		ID:          "1",
-		Name:        "mybook",
-		Description: "",
-		PublishDate: "",
-		AuthorID:    "1",
-	}}
+	books := make([]*BookResolver, 0, len(dm.Books))
 
-	books = append(books, first_book)
+	for _, book := range dm.Books {
+		books = append(books, book)
+	}
 
 	return books
 }

@@ -5,6 +5,7 @@ import "github.com/graph-gophers/graphql-go"
 type Comment struct {
 	ID     graphql.ID
 	Text   string
+	Date   string
 	BookID graphql.ID
 	UserID graphql.ID
 }
@@ -21,15 +22,12 @@ func (comment *CommentResolver) Text() string {
 	return comment.Data.Text
 }
 
+func (comment *CommentResolver) Date() string {
+	return comment.Data.Date
+}
+
 func (comment *CommentResolver) Book() *BookResolver {
-	first_book := &BookResolver{&Book{
-		ID:          "1",
-		Name:        "mybook",
-		Description: "",
-		PublishDate: "",
-		AuthorID:    "1",
-	}}
-	return first_book
+	return dm.Books[comment.Data.BookID]
 }
 
 func (comment *CommentResolver) UserId() graphql.ID {

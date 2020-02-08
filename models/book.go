@@ -31,10 +31,17 @@ func (book *BookResolver) PublishDate() string {
 }
 
 func (book *BookResolver) Author() *AuthorResolver {
-	first_author := &AuthorResolver{&Author{
-		ID:         "2",
-		Name:       "test",
-		SecondName: "",
-	}}
-	return first_author
+	return dm.Authors[book.Data.AuthorID]
+}
+
+func (book *BookResolver) Comments() []*CommentResolver {
+	comments := make([]*CommentResolver, 0, 1)
+
+	for _, comment := range dm.Comments {
+		if comment.Data.BookID == book.ID() {
+			comments = append(comments, comment)
+		}
+	}
+
+	return comments
 }
