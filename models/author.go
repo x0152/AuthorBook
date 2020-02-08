@@ -1,6 +1,6 @@
-package author
+package models
 
-import graphql "github.com/graph-gophers/graphql-go"
+import "github.com/graph-gophers/graphql-go"
 
 type Author struct {
 	ID         graphql.ID
@@ -22,4 +22,19 @@ func (author *AuthorResolver) Name() string {
 
 func (author *AuthorResolver) SecondName() string {
 	return author.Data.SecondName
+}
+
+func (author *AuthorResolver) Books() []*BookResolver {
+	var books []*BookResolver
+	first_book := &BookResolver{&Book{
+		ID:          "1",
+		Name:        "mybook",
+		Description: "",
+		PublishDate: "",
+		AuthorID:    "1",
+	}}
+
+	books = append(books, first_book)
+
+	return books
 }

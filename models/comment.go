@@ -1,4 +1,4 @@
-package comment
+package models
 
 import "github.com/graph-gophers/graphql-go"
 
@@ -21,8 +21,15 @@ func (comment *CommentResolver) Text() string {
 	return comment.Data.Text
 }
 
-func (comment *CommentResolver) BookId() graphql.ID {
-	return comment.Data.BookID
+func (comment *CommentResolver) Book() *BookResolver {
+	first_book := &BookResolver{&Book{
+		ID:          "1",
+		Name:        "mybook",
+		Description: "",
+		PublishDate: "",
+		AuthorID:    "1",
+	}}
+	return first_book
 }
 
 func (comment *CommentResolver) UserId() graphql.ID {

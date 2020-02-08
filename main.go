@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"./models"
 	"./schema"
 
 	"github.com/graph-gophers/graphql-go"
@@ -12,7 +13,7 @@ import (
 
 func main() {
 
-	schema := graphql.MustParseSchema(schema.Schema, &schema.Resolver{})
+	schema := graphql.MustParseSchema(schema.Schema, &models.Resolver{})
 
 	http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write(page)
