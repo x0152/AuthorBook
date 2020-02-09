@@ -1,14 +1,46 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"./models"
 	"./schema"
 	"github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/relay"
 )
+
+type params struct {
+	Query         string                 `json:"query"`
+	OperationName string                 `json:"operationName"`
+	Variables     map[string]interface{} `json:"variables"`
+}
+
+type QueryHandler struct {
+	Schema *graphql.Schema
+}
+
+func (h *QueryHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	var userResolver *models.UserResolver
+	userResolver = nil
+
+	authorizationData := r.Header.Get("Authorization")
+	if authorizationData != "" {
+		splitToken := strings.Split(authorizationData, "Token ")
+		token := splitToken[1]
+
+		for _, authToken := range models.Dm.AuthTokens {
+			if authToken.Data.Token == token {
+				userResolver = authToken.User()
+			}
+		}
+	}
+	queryHandler := relay.Handler{Schema: h.Schema}
+	queryHandler.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), "User", userResolver)))
+}
 
 func main() {
 
@@ -18,7 +50,9 @@ func main() {
 		w.Write(page)
 	}))
 
-	http.Handle("/query", &relay.Handler{Schema: schema})
+	http.Handle("/query", &QueryHandler{schema})
+
+	fmt.Print("Server started on port 8080...")
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

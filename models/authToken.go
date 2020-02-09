@@ -21,5 +21,5 @@ func (authtoken *AuthTokenResolver) Token() string {
 }
 
 func (authtoken *AuthTokenResolver) User() *UserResolver {
-	return dm.Users[authtoken.Data.UserID]
+	return Dm.Users[authtoken.Data.UserID]
 }

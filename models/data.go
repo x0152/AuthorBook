@@ -9,34 +9,34 @@ import (
 )
 
 type DataManager struct {
-	Books     map[graphql.ID]*BookResolver
-	Authors   map[graphql.ID]*AuthorResolver
-	Comments  map[graphql.ID]*CommentResolver
-	Users     map[graphql.ID]*UserResolver
-	AuthToken map[graphql.ID]*AuthTokenResolver
+	Books      map[graphql.ID]*BookResolver
+	Authors    map[graphql.ID]*AuthorResolver
+	Comments   map[graphql.ID]*CommentResolver
+	Users      map[graphql.ID]*UserResolver
+	AuthTokens map[graphql.ID]*AuthTokenResolver
 }
 
-var dm DataManager
+var Dm DataManager
 
 func init() {
-	dm = DataManager{
-		Books:     make(map[graphql.ID]*BookResolver),
-		Authors:   make(map[graphql.ID]*AuthorResolver),
-		Comments:  make(map[graphql.ID]*CommentResolver),
-		Users:     make(map[graphql.ID]*UserResolver),
-		AuthToken: make(map[graphql.ID]*AuthTokenResolver),
+	Dm = DataManager{
+		Books:      make(map[graphql.ID]*BookResolver),
+		Authors:    make(map[graphql.ID]*AuthorResolver),
+		Comments:   make(map[graphql.ID]*CommentResolver),
+		Users:      make(map[graphql.ID]*UserResolver),
+		AuthTokens: make(map[graphql.ID]*AuthTokenResolver),
 	}
 
-	dm.Books = LoadBooks()
-	dm.Authors = LoadAuthors()
-
-	// TODO load user and comments
+	Dm.Books = LoadBooks()
+	Dm.Authors = LoadAuthors()
+	Dm.Users = LoadUsers()
+	Dm.Comments = LoadComments()
 
 }
 
 func LoadBooks() map[graphql.ID]*BookResolver {
 	resolver_books := make(map[graphql.ID]*BookResolver)
-	file, err := ioutil.ReadFile("books.json")
+	file, err := ioutil.ReadFile("init_data/books.json")
 
 	if err != nil {
 		log.Fatalf("Неудалось загрузить книги из файла books.json (файл отсутствует или недостаточно прав на чтение): %v", err)
@@ -61,7 +61,7 @@ func LoadBooks() map[graphql.ID]*BookResolver {
 
 func LoadAuthors() map[graphql.ID]*AuthorResolver {
 	resolver_authors := make(map[graphql.ID]*AuthorResolver)
-	file, err := ioutil.ReadFile("authors.json")
+	file, err := ioutil.ReadFile("init_data/authors.json")
 
 	if err != nil {
 		log.Fatalf("Неудалось загрузить авторов из файла authors.json (файл отсутствует или недостаточно прав на чтение): %v", err)
@@ -82,4 +82,54 @@ func LoadAuthors() map[graphql.ID]*AuthorResolver {
 	log.Printf("Авторы успешно загружены: %v", authors)
 
 	return resolver_authors
+}
+
+func LoadUsers() map[graphql.ID]*UserResolver {
+	resolver_users := make(map[graphql.ID]*UserResolver)
+	file, err := ioutil.ReadFile("init_data/users.json")
+
+	if err != nil {
+		log.Fatalf("Неудалось загрузить авторов из файла users.json (файл отсутствует или недостаточно прав на чтение): %v", err)
+	}
+
+	var users []User
+	err = json.Unmarshal([]byte(file), &users)
+
+	if err != nil {
+		log.Fatalf("Неудалось декодировать json файл: %v", err)
+	}
+
+	for _, user := range users {
+		u := user
+		resolver_users[user.ID] = &UserResolver{&u}
+	}
+
+	log.Printf("Пользователи успешно загружены: %v", users)
+
+	return resolver_users
+}
+
+func LoadComments() map[graphql.ID]*CommentResolver {
+	resolver_comments := make(map[graphql.ID]*CommentResolver)
+	file, err := ioutil.ReadFile("init_data/comments.json")
+
+	if err != nil {
+		log.Fatalf("Неудалось загрузить комментарии из файла comments.json (файл отсутствует или недостаточно прав на чтение): %v", err)
+	}
+
+	var comments []Comment
+	err = json.Unmarshal([]byte(file), &comments)
+
+	if err != nil {
+		log.Fatalf("Неудалось декодировать json файл: %v", err)
+	}
+
+	for _, comment := range comments {
+		c := comment
+		resolver_comments[comment.ID] = &CommentResolver{&c}
+	}
+
+	log.Printf("Комментарии успешно загружены: %v", comments)
+
+	return resolver_comments
 }

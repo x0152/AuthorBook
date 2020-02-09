@@ -27,9 +27,9 @@ func (comment *CommentResolver) Date() string {
 }
 
 func (comment *CommentResolver) Book() *BookResolver {
-	return dm.Books[comment.Data.BookID]
+	return Dm.Books[comment.Data.BookID]
 }
 
 func (comment *CommentResolver) User() *UserResolver {
-	return dm.Users[comment.Data.UserID]
+	return Dm.Users[comment.Data.UserID]
 }

@@ -28,7 +28,7 @@ func (author *AuthorResolver) Books() []*BookResolver {
 
 	books := make([]*BookResolver, 0, 1)
 
-	for _, book := range dm.Books {
+	for _, book := range Dm.Books {
 		if book.Data.AuthorID == author.Data.ID {
 			books = append(books, book)
 		}

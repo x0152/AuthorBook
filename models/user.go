@@ -4,7 +4,7 @@ import "github.com/graph-gophers/graphql-go"
 
 type User struct {
 	ID        graphql.ID
-	Login     string
+	Username  string
 	Password  string
 	FirstName string
 	LastName  string

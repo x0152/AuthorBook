@@ -17,8 +17,8 @@ var Schema = `
 
 		type Mutation{
 			createComment(bookid: ID!, text: String!): Comment 
-			createUser(login: String!, password: String!, firstname: String!, lastname: String!): User
-			login(login: String!, password: String!): AuthToken
+			createUser(username: String!, password: String!, firstname: String!, lastname: String!): User
+			login(username: String!, password: String!): AuthToken
 		}
 
 		interface User{

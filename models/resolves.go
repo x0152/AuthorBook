@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
@@ -12,104 +13,110 @@ import (
 type Resolver struct {
 }
 
-func (r *Resolver) User(args struct{ ID graphql.ID }) *UserResolver {
-	return dm.Users[args.ID]
+func (r *Resolver) User(ctx context.Context, args struct{ ID graphql.ID }) *UserResolver {
+	return Dm.Users[args.ID]
 }
 
-func (r *Resolver) Authors() []*AuthorResolver {
-	authors := make([]*AuthorResolver, 0, len(dm.Books))
+func (r *Resolver) Authors(ctx context.Context) []*AuthorResolver {
+	authors := make([]*AuthorResolver, 0, len(Dm.Books))
 
-	for _, author := range dm.Authors {
+	for _, author := range Dm.Authors {
 		authors = append(authors, author)
 	}
 
 	return authors
 }
 
-func (r *Resolver) Author(args struct{ ID graphql.ID }) *AuthorResolver {
-	return dm.Authors[args.ID]
+func (r *Resolver) Author(ctx context.Context, args struct{ ID graphql.ID }) *AuthorResolver {
+	return Dm.Authors[args.ID]
 }
 
-func (r *Resolver) Books() []*BookResolver {
-	books := make([]*BookResolver, 0, len(dm.Books))
+func (r *Resolver) Books(ctx context.Context) []*BookResolver {
+	books := make([]*BookResolver, 0, len(Dm.Books))
 
-	for _, book := range dm.Books {
+	for _, book := range Dm.Books {
 		books = append(books, book)
 	}
 
 	return books
 }
 
-func (r *Resolver) Book(args struct{ ID graphql.ID }) *BookResolver {
-	return dm.Books[args.ID]
+func (r *Resolver) Book(ctx context.Context, args struct{ ID graphql.ID }) *BookResolver {
+	return Dm.Books[args.ID]
 }
 
-func (r *Resolver) CreateComment(args struct {
+func (r *Resolver) CreateComment(ctx context.Context, args struct {
 	Bookid graphql.ID
 	Text   string
-}) *CommentResolver {
+}) (*CommentResolver, error) {
+	userResolver, _ := ctx.Value("User").(*UserResolver)
+	if userResolver == nil {
+		return nil, fmt.Errorf("Комментарии могут оставлять только зарегистированные пользователи.")
+	}
 
-	id := graphql.ID(fmt.Sprintf("%d", len(dm.Comments)))
+	id := graphql.ID(fmt.Sprintf("%d", len(Dm.Comments)))
 	newComment := &Comment{
 		ID:     id,
 		BookID: args.Bookid,
+		UserID: userResolver.ID(),
 		Text:   args.Text,
 		Date:   time.Now().Format("2019-12-01 15:04:05"),
 	}
 	newCommentResolve := &CommentResolver{newComment}
-	dm.Comments[id] = newCommentResolve
+	Dm.Comments[id] = newCommentResolve
 
 	log.Printf("Добавлен коментарий %v", newComment)
-	return newCommentResolve
+	return newCommentResolve, nil
 }
 
-func (r *Resolver) CreateUser(args struct {
-	Login     string
+func (r *Resolver) CreateUser(ctx context.Context, args struct {
+	Username  string
 	Password  string
 	FirstName string
 	LastName  string
 }) (*UserResolver, error) {
-	for _, user := range dm.Users {
-		if user.Data.Login == args.Login {
-			return nil, fmt.Errorf("User with login already exists")
+	for _, user := range Dm.Users {
+		if user.Data.Username == args.Username {
+			return nil, fmt.Errorf("Пользователь с таким именем пользователя уже существует.")
 		}
 
 	}
 
-	id := graphql.ID(fmt.Sprintf("%d", len(dm.Users)))
+	id := graphql.ID(fmt.Sprintf("%d", len(Dm.Users)))
 	newUser := &User{
 		ID:        id,
-		Login:     args.Login,
+		Username:  args.Username,
 		Password:  args.Password,
 		FirstName: args.FirstName,
 		LastName:  args.LastName,
 	}
 	newUserResolve := &UserResolver{newUser}
-	dm.Users[id] = newUserResolve
+	Dm.Users[id] = newUserResolve
 
 	log.Printf("Добавлен пользователь %v", newUser)
 	return newUserResolve, nil
 }
 
-func (r *Resolver) Login(args struct {
-	Login    string
+func (r *Resolver) Login(ctx context.Context, args struct {
+	Username string
 	Password string
 }) (*AuthTokenResolver, error) {
-	for _, user := range dm.Users {
-		if (user.Data.Login == args.Login) && (user.Data.Password == args.Password) {
+	for _, user := range Dm.Users {
+		if (user.Data.Username == args.Username) && (user.Data.Password == args.Password) {
 			uuid, err := uuid.NewV4()
 			if err != nil {
 				log.Printf("Ошибка генерации токена: %v", err)
 			}
-			id := graphql.ID(fmt.Sprintf("%d", len(dm.AuthToken)))
+			id := graphql.ID(fmt.Sprintf("%d", len(Dm.AuthTokens)))
 			newToken := &AuthToken{
 				ID:     id,
 				Token:  uuid.String(),
 				UserID: user.Data.ID,
 			}
 			newTokenResolve := &AuthTokenResolver{newToken}
+			Dm.AuthTokens[id] = newTokenResolve
 			return newTokenResolve, nil
 		}
 	}
-	return nil, fmt.Errorf("Invalid login or password credentials")
+	return nil, fmt.Errorf("Неверные имя пользователя или пароль.")
 }

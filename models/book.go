@@ -31,13 +31,13 @@ func (book *BookResolver) PublishDate() string {
 }
 
 func (book *BookResolver) Author() *AuthorResolver {
-	return dm.Authors[book.Data.AuthorID]
+	return Dm.Authors[book.Data.AuthorID]
 }
 
 func (book *BookResolver) Comments() []*CommentResolver {
 	comments := make([]*CommentResolver, 0, 1)
 
-	for _, comment := range dm.Comments {
+	for _, comment := range Dm.Comments {
 		if comment.Data.BookID == book.ID() {
 			comments = append(comments, comment)
 		}
