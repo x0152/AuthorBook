@@ -30,6 +30,6 @@ func (comment *CommentResolver) Book() *BookResolver {
 	return dm.Books[comment.Data.BookID]
 }
 
-func (comment *CommentResolver) UserId() graphql.ID {
-	return comment.Data.UserID
+func (comment *CommentResolver) User() *UserResolver {
+	return dm.Users[comment.Data.UserID]
 }

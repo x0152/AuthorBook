@@ -6,7 +6,6 @@ import (
 
 	"./models"
 	"./schema"
-
 	"github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/relay"
 )

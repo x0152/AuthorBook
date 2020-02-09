@@ -1,12 +1,12 @@
 [
   {
     "id": "1",
-    "name": "Федор",
-    "secondname": "Достоевский"
+    "firstname": "Федор",
+    "lastdname": "Достоевский"
   },
   {
-    "id": "0",
-    "name": "Михаил",
-    "secondname": "Булгаков"
+    "id": "2",
+    "firstname": "Михаил",
+    "lastname": "Булгаков"
   }
 ]

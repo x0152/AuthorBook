@@ -3,9 +3,9 @@ package models
 import "github.com/graph-gophers/graphql-go"
 
 type Author struct {
-	ID         graphql.ID
-	Name       string
-	SecondName string
+	ID        graphql.ID
+	FirstName string
+	LastName  string
 }
 
 type AuthorResolver struct {
@@ -16,12 +16,12 @@ func (author *AuthorResolver) ID() graphql.ID {
 	return author.Data.ID
 }
 
-func (author *AuthorResolver) Name() string {
-	return author.Data.Name
+func (author *AuthorResolver) FirstName() string {
+	return author.Data.FirstName
 }
 
-func (author *AuthorResolver) SecondName() string {
-	return author.Data.SecondName
+func (author *AuthorResolver) LastName() string {
+	return author.Data.LastName
 }
 
 func (author *AuthorResolver) Books() []*BookResolver {

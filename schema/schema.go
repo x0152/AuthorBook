@@ -9,14 +9,33 @@ var Schema = `
 		type Query {
 			book(id: ID!): Book 
 			author(id: ID!): Author
-			comment(id: ID!): Comment
+			user(id: ID!): User
 
 			authors(): [Author!]!
 			books(): [Book!]!
 		}
 
 		type Mutation{
-			createComment(bookid: ID!, text: String!, date: String!): Comment 
+			createComment(bookid: ID!, text: String!): Comment 
+			createUser(login: String!, password: String!, firstname: String!, lastname: String!): User
+			login(login: String!, password: String!): AuthToken
+		}
+
+		interface User{
+			id: ID!
+			firstname: String!
+			lastname: String!
+		}
+
+		interface AuthToken{
+			token: String!
+		}
+
+		interface Author{
+			id: ID!
+			firstname: String!
+			lastname: String!
+			books: [Book!]!
 		}
 
 		interface Book{
@@ -28,18 +47,11 @@ var Schema = `
 			comments: [Comment!]!
 		}
 
-		interface Author{
-			id: ID!
-			name: String!
-			secondname: String!
-			books: [Book!]!
-		}
-
 		interface Comment{
 			id: ID!
 			text: String!
 			date: String!
 			book: Book!
-			userid: ID!  
+			user: User!  
 		}
 	`

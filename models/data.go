@@ -9,22 +9,28 @@ import (
 )
 
 type DataManager struct {
-	Books    map[graphql.ID]*BookResolver
-	Authors  map[graphql.ID]*AuthorResolver
-	Comments map[graphql.ID]*CommentResolver
+	Books     map[graphql.ID]*BookResolver
+	Authors   map[graphql.ID]*AuthorResolver
+	Comments  map[graphql.ID]*CommentResolver
+	Users     map[graphql.ID]*UserResolver
+	AuthToken map[graphql.ID]*AuthTokenResolver
 }
 
 var dm DataManager
 
 func init() {
 	dm = DataManager{
-		Books:    make(map[graphql.ID]*BookResolver),
-		Authors:  make(map[graphql.ID]*AuthorResolver),
-		Comments: make(map[graphql.ID]*CommentResolver),
+		Books:     make(map[graphql.ID]*BookResolver),
+		Authors:   make(map[graphql.ID]*AuthorResolver),
+		Comments:  make(map[graphql.ID]*CommentResolver),
+		Users:     make(map[graphql.ID]*UserResolver),
+		AuthToken: make(map[graphql.ID]*AuthTokenResolver),
 	}
 
 	dm.Books = LoadBooks()
 	dm.Authors = LoadAuthors()
+
+	// TODO load user and comments
 
 }
 
