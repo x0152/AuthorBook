@@ -1,14 +1,13 @@
 package main
 
 import (
+	"authorBook/models"
+	"authorBook/schema"
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
 
-	"./models"
-	"./schema"
 	"github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/relay"
 )
@@ -50,9 +49,9 @@ func main() {
 		w.Write(page)
 	}))
 
-	http.Handle("/query", &QueryHandler{schema})
+	http.Handle("/api/query", &QueryHandler{schema})
 
-	fmt.Print("Server started on port 8080...")
+	log.Print("Server started on port 8080...")
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
@@ -72,7 +71,7 @@ var page = []byte(`
 		<div id="graphiql" style="height: 100vh;">Loading...</div>
 		<script>
 			function graphQLFetcher(graphQLParams) {
-				return fetch("/query", {
+				return fetch("/api/query", {
 					method: "post",
 					body: JSON.stringify(graphQLParams),
 					credentials: "include",
